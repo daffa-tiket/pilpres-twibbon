@@ -75,7 +75,26 @@ async function handleClick(event) {
     drawLandmarks(cxt, landmarks, { color: "#FF0000", lineWidth: 1 });
   }
   console.log(handLandmarkerResult.landmarks[0])
-  detectPose(handLandmarkerResult.landmarks[0])
+  //detectPose(handLandmarkerResult.landmarks[0])
+  let wording = "gak niat bjir"
+  let fingers = countFingers(handLandmarkerResult.landmarks[0])
+
+  if (fingers == 1){
+    wording = "Buzzer janji manies kh ?"
+  }
+
+  if (fingers == 2){
+    wording = "Pendukung dinasti bjir"
+  }
+
+  if (fingers == 3){
+    wording = "Skip wadas kocak"
+  }
+
+  if (fingers == 4){
+    wording = "Lu temen gw"
+  }
+  alert(wording)
 }
 
 function detectPose(landmarks) {
@@ -192,4 +211,27 @@ function arePointsCollinear(x1, y1, x2, y2, x3, y3, x4, y4) {
   }
 
   return Math.abs(slopeAD - slopeAB) < tolerance;
+}
+
+function countFingers(handLandmarks) {
+  // Define landmarks for each finger
+  const fingerLandmarks = [
+    [4, 3, 2, 1],  // Thumb (using the tip of the thumb)
+    [8, 7, 6, 5],  // Index finger
+    [12, 11, 10, 9],  // Middle finger
+    [16, 15, 14, 13],  // Ring finger
+    [20, 19, 18, 17],  // Little finger
+  ];
+
+  let fingerCount = 0;
+
+  // Loop through each finger
+  for (const finger of fingerLandmarks) {
+    // Check if the finger is extended (the tip is above the base)
+    if (handLandmarks[finger[0]].y < handLandmarks[finger[3]].y) {
+      fingerCount++;
+    }
+  }
+
+  return fingerCount-1
 }
