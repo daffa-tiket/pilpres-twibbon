@@ -74,6 +74,7 @@ async function handleClick(event) {
     });
     drawLandmarks(cxt, landmarks, { color: "#FF0000", lineWidth: 1 });
   }
+  console.log(handLandmarkerResult.landmarks[0])
   detectPose(handLandmarkerResult.landmarks[0])
 }
 
@@ -104,31 +105,49 @@ function detectPose(landmarks) {
     }
   }
 
-  if (checkFinger(thumbsF)) {
+  if (checkFinger(thumbsF, "thumbsF")) {
     console.log("thumbsF")
     countLinear++;
   }
-  if (checkFinger(indexF)) {
+  if (checkFinger(indexF, "indexF")) {
     console.log("indexF")
     countLinear++;
   }
-  if (checkFinger(middleF)) {
+  if (checkFinger(middleF, "middleF")) {
     console.log("middleF")
     countLinear++;
   }
-  if (checkFinger(ringF)) {
+  if (checkFinger(ringF, "ringF")) {
     console.log("ringF")
     countLinear++;
   }
-  if (checkFinger(pinkyF)) {
+  if (checkFinger(pinkyF, "pinkyF")) {
     console.log("pinkyF")
     countLinear++;
   }
 
+  let wording = "gak niat milih bjir"
+
+  if (countLinear == 1){
+    wording = "Buzzer janji manies kh ?"
+  }
+
+  if (countLinear == 2){
+    wording = "Pendukung dinasti bjir"
+  }
+
+  if (countLinear == 3){
+    wording = "Skip wadas kocak"
+  }
+
+  if (countLinear == 4){
+    wording = "Lu temen gw"
+  }
   console.log(countLinear)
+  alert(wording)
 }
 
-function checkFinger(fingers) {
+function checkFinger(fingers, fingerName) {
   let x1 = 0;
   let y1 = 0;
   let x2 = 0;
@@ -156,7 +175,10 @@ function checkFinger(fingers) {
     }
   }
 
-  return arePointsCollinear(x1, y1, x2, y2, x3, y3, x4, y4)
+  let isLinear = arePointsCollinear(x1, y1, x2, y2, x3, y3, x4, y4)
+
+  console.log(fingerName, isLinear)
+  return isLinear
 }
 
 function arePointsCollinear(x1, y1, x2, y2, x3, y3, x4, y4) {
@@ -164,7 +186,7 @@ function arePointsCollinear(x1, y1, x2, y2, x3, y3, x4, y4) {
   const slopeAC = (y3 - y1) / (x3 - x1);
   const slopeAD = (y4 - y1) / (x4 - x1);
 
-  const tolerance = 1.7;
+  const tolerance = 3;
   if (Math.abs(slopeAB - slopeAC) >= tolerance) {
     return false;
   }
