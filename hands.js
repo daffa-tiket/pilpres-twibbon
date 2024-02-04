@@ -3,12 +3,9 @@ import {
   FilesetResolver
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-const demosSection = document.getElementById("demos");
 
 let handLandmarker = undefined;
 let runningMode = "IMAGE";
-let enableWebcamButton;
-let webcamRunning = false;
 
 const createHandLandmarker = async () => {
   const vision = await FilesetResolver.forVisionTasks(
@@ -22,18 +19,11 @@ const createHandLandmarker = async () => {
     runningMode: runningMode,
     numHands: 2
   });
-  demosSection.classList.remove("invisible");
 };
 createHandLandmarker();
 
-export function registerClickListeners() {
-  const imageContainers = document.getElementsByClassName("detectOnClick");
-  for (let i = 0; i < imageContainers.length; i++) {
-    imageContainers[i].children[0].addEventListener("click", handleClick);
-  }
-}
-
-async function handleClick(event) {
+export async function handleClick(event, barbarMode) {
+  console.log("tess")
   if (!handLandmarker) {
     console.log("Wait for handLandmarker to load before clicking!");
     return;
@@ -44,58 +34,56 @@ async function handleClick(event) {
     await handLandmarker.setOptions({ runningMode: "IMAGE" });
   }
 
-  const allCanvas = event.target.parentNode.getElementsByClassName("canvas");
+  const allCanvas = event.target.getElementsByClassName("canvas");
   for (let i = allCanvas.length - 1; i >= 0; i--) {
     const n = allCanvas[i];
     n.parentNode.removeChild(n);
   }
 
   const handLandmarkerResult = await handLandmarker.detect(event.target);
-  const canvas = document.createElement("canvas");
-  canvas.setAttribute("class", "canvas");
-  canvas.setAttribute("width", event.target.naturalWidth + "px");
-  canvas.setAttribute("height", event.target.naturalHeight + "px");
-  canvas.style =
-    "left: 0px;" +
-    "top: 0px;" +
-    "width: " +
-    event.target.width +
-    "px;" +
-    "height: " +
-    event.target.height +
-    "px;";
-
-  event.target.parentNode.appendChild(canvas);
-  const cxt = canvas.getContext("2d");
-  var twibbonImage = new Image();
-  twibbonImage.src = 'amin-twibbon.png';
-  twibbonImage.onload = function () {
-    cxt.drawImage(twibbonImage, 0, 0, canvas.width, canvas.height);
-    cxt.fillStyle = 'white';
-    cxt.font = '20px Arial';
-    cxt.fillText('Your Text Here', 10, 30);
-  };
   console.log(handLandmarkerResult.landmarks[0])
-  //detectPose(handLandmarkerResult.landmarks[0])
   let wording = "gak niat bjir"
   let fingers = countFingers(handLandmarkerResult.landmarks[0])
 
+  //let twibbon = document.getElementById("twibbon")
+  let downloadBtn = document.getElementById("downloadBtn")
+  let twibbonImage = new Image();
   if (fingers == 1) {
+    twibbonImage.src = 'amin-twibbon.png';
     wording = "Buzzer janji manies kh ?"
+
   }
 
   if (fingers == 2) {
+    twibbonImage.src = 'praban-twibbon.png';
     wording = "Pendukung dinasti bjir"
   }
 
   if (fingers == 3) {
-    wording = "Skip wadas kocak"
+    twibbonImage.src = 'gama-twibbon.png';
+    wording = "Skip petugas partai"
   }
 
   if (fingers == 4) {
     wording = "Lu temen gw"
   }
-  alert(wording)
+  twibbonImage.onload = function() {
+    // Now that the image is loaded, you can draw it onto the canvas
+    let canvas = document.getElementById("canvas");
+    let video = document.getElementById("video");
+    let capturedImage = document.getElementById("capturedImage");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext('2d');
+    context.drawImage(capturedImage, 0, 0, canvas.width, canvas.height);
+    context.drawImage(twibbonImage, 0, 0, canvas.width, canvas.height);
+    capturedImage.style.display = "none";
+    canvas.style.display = "block";
+    downloadBtn.style.display = "block";
+    if (barbarMode) {
+      alert(wording);
+    }
+  };
 }
 
 function countFingers(handLandmarks) {
