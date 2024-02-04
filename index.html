@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JJ35goe+1fW8Jp8qGKpLbp1Jlq6a6D5lqdSjVhJQCUBV2KLQQO7icF00bM54IDlL"
+        crossorigin="anonymous"></script>
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="index.css">
+    <script type="module" src="hands.js"></script>
+    <title>Webcam Capture</title>
+</head>
+
+<body class="container">
+    <section id="demos" class="mt-5">
+
+        <div class="row">
+            <div class="col-md-6">
+                <video id="video" class="img-fluid" playsinline autoplay></video>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-primary" onclick="captureImage()">Capture Image</button>
+                <div id="result" class="mt-3"></div>
+            </div>
+        </div>
+
+    </section>
+
+    <script>
+        // document.getElementById('testButton').addEventListener('click', function (event) {
+        //     console.log(event.target.parentNode);
+        // });
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                var video = document.getElementById('video');
+                video.srcObject = stream;
+            })
+            .catch(function (err) {
+                console.error("Error accessing the webcam: " + err);
+            });
+
+        function captureImage() {
+            var video = document.getElementById('video');
+            var canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            var context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            var resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+
+            var img = document.createElement('img');
+            img.src = canvas.toDataURL('image/png');
+
+            var imgContainer = document.createElement('div');
+            imgContainer.classList.add('detectOnClick'); // Add the class to the container
+            imgContainer.appendChild(img);
+
+            resultDiv.appendChild(imgContainer);
+
+            var testButton = document.createElement('button');
+            testButton.id = 'testButton';
+            testButton.innerHTML = 'Test Button';
+            testButton.onclick = function () {
+                import('./hands.js').then(module => module.registerClickListeners());
+            };
+
+            resultDiv.appendChild(testButton);
+        }
+    </script>
+    <script type="module" src="hands.js"></script>
+    <script type="module">
+        // You can also import the function directly in a script block
+        import { registerClickListeners } from './hands.js';
+        window.registerClickListeners = registerClickListeners;
+    </script>
+</body>
+
+</html>
