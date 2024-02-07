@@ -49,13 +49,27 @@
                                 <strong>Selamat Datang di Pilpres 2024 Twibbon Generator!</strong>
                                 <p class="mb-0">Silakan klik "Capture Image" dan pose dengan jari sesuai capres favorit
                                     Anda.</p>
-                                <p class="mb-0"><strong>Website ini tidak menyimpan hasil foto (biaya storagenya mahal bjir), aman slurr</strong></p>
+                                <p class="mb-0"><strong>Website ini tidak menyimpan hasil foto (biaya storagenya mahal
+                                        bjir), aman slurr</strong></p>
                             </div>
                         </div>
                         <video id="video" width="100%" height="auto" autoplay></video>
                         <button class="btn btn-primary mt-3" id="captureBtn">Capture Image</button>
-                        <button class="btn btn-secondary mt-3" id="retakeBtn" style="display: none;">Retake</button>
-                        <button class="btn btn-success mt-3" id="downloadBtn" style="display: none;">Download</button>
+                        <div class="col">
+                            <div class="row" id="resultText"
+                                style="text-align: center; color: black; top: 100%; display: none;">
+                                Klik Gambar Untuk Melihat Hasil Deteksi
+                            </div>
+                            <div class="row">
+                                <button class="col btn btn-secondary m-3" id="retakeBtn"
+                                    style="display: none;">Retake</button>
+                                <button class="col btn btn-success m-3" id="downloadBtn"
+                                    style="display: none;">Download</button>
+                                <button class="col btn btn-danger m-3" id="changeTwibbonBtn"
+                                    style="display: none;">Ganti
+                                    Twibbon</button>
+                            </div>
+                        </div>
                         <canvas id="canvas" class="mt-3" style="display: none;"></canvas>
                         <div id="imageContainer" style="position: relative;">
                             <img id="capturedImage" class="img-fluid mt-3" style="display: none; cursor: pointer;">
@@ -64,10 +78,6 @@
                         </div>
                         <div id="countdown"
                             style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3em; color: white; display: none;">
-                        </div>
-                        <div id="resultText"
-                            style="text-align: center; color: black; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); display: none;">
-                            Klik Gambar Untuk Melihat Hasil Deteksi
                         </div>
                         <div id="safeModeToggleContainer" class="form-check form-switch">
                             <label id="safeModeToggleLabel" class="form-check-label">Barbar Mode</label>
@@ -89,6 +99,7 @@
             const captureBtn = document.getElementById('captureBtn');
             const retakeBtn = document.getElementById('retakeBtn');
             const downloadBtn = document.getElementById('downloadBtn');
+            const changeTwibbonBtn = document.getElementById('changeTwibbonBtn');
             const canvas = document.getElementById('canvas');
             const capturedImage = document.getElementById('capturedImage');
             const twibbon = document.getElementById('twibbon');
@@ -137,7 +148,9 @@
                 captureBtn.style.display = 'none';
                 retakeBtn.style.display = 'block';
                 downloadBtn.style.display = 'block';
+                changeTwibbonBtn.style.display = 'block'
                 resultText.style.display = 'block';
+                localStorage.setItem('fingers', 0);
             }
 
             captureBtn.addEventListener('click', () => {
@@ -153,6 +166,7 @@
                 twibbon.style.display = 'none';
                 resultText.style.display = 'none';
                 downloadBtn.style.display = 'none';
+                changeTwibbonBtn.style.display = 'none'
                 canvas.style.display = 'none'
                 startCountdown(2);
             });
@@ -172,6 +186,23 @@
                 barbarMode = safeModeToggle.checked;
                 console.log('Safe Mode:', barbarMode);
             });
+            changeTwibbonBtn.addEventListener('click', (event) => {
+                var fingers = localStorage.getItem('fingers');
+                if (fingers != 0) {
+                    var index = localStorage.getItem('index');
+                    let canvas = document.getElementById("canvas");
+                    const context = canvas.getContext('2d');
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    let changedIndex = 1;
+                    if (index == 1) {
+                        changedIndex = 2
+                    }
+                    import('./hands.js').then(module => module.loadTwibbon(fingers, barbarMode, changedIndex));
+                } else {
+                    alert("silahkan klik hasil foto terlebih dahulu")
+                }
+                //twibbon.style.display = 'block';
+            });
             const toastEl = document.querySelector('.toast');
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
@@ -180,8 +211,9 @@
     <script type="module" src="hands.js"></script>
     <script type="module">
         // You can also import the function directly in a script block
-        import { handleClick } from './hands.js';
+        import { handleClick, loadTwibbon } from './hands.js';
         window.handleClick = handleClick;
+        window.loadTwibbon = loadTwibbon;
     </script>
 
 </body>

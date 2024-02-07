@@ -42,32 +42,35 @@ export async function handleClick(event, barbarMode) {
 
   const handLandmarkerResult = await handLandmarker.detect(event.target);
   console.log(handLandmarkerResult.landmarks[0])
-  let wording = "gak niat bjir"
   let fingers = countFingers(handLandmarkerResult.landmarks[0])
+  localStorage.setItem('fingers', fingers);
+  loadTwibbon(fingers, barbarMode, 1);
+}
 
-  //let twibbon = document.getElementById("twibbon")
-  let downloadBtn = document.getElementById("downloadBtn")
+export function loadTwibbon(fingers, barbarMode, index) {
+  localStorage.setItem('index', index)
+  let wording = "gak niat bjir";
+  let downloadBtn = document.getElementById("downloadBtn");
   let twibbonImage = new Image();
   if (fingers == 1) {
-    twibbonImage.src = 'amin-twibbon.png';
-    wording = "Buzzer janji manies kh ?"
-
+    twibbonImage.src = `amin-twibbon-${index}.png`;
+    wording = "Buzzer janji manies kh ?";
   }
 
   if (fingers == 2) {
-    twibbonImage.src = 'praban-twibbon.png';
-    wording = "Pendukung dinasti bjir"
+    twibbonImage.src = `praban-twibbon-${index}.png`;
+    wording = "Pendukung dinasti bjir";
   }
 
   if (fingers == 3) {
-    twibbonImage.src = 'gama-twibbon.png';
-    wording = "Skip petugas partai"
+    twibbonImage.src = `gama-twibbon-${index}.png`;
+    wording = "Skip petugas partai";
   }
 
   if (fingers == 4) {
-    wording = "Lu temen gw"
+    wording = "Lu temen gw";
   }
-  twibbonImage.onload = function() {
+  twibbonImage.onload = function () {
     // Now that the image is loaded, you can draw it onto the canvas
     let canvas = document.getElementById("canvas");
     let video = document.getElementById("video");
